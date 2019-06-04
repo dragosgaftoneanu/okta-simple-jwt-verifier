@@ -23,7 +23,7 @@ else
 
 class OktaSimpleJWTVerifier
 {
-	protected $jwt, $audience = "", $clientId = "", $issuer = "", $error = "";
+	protected $jwt, $audience = "", $clientId = "", $issuer = "", $error = "", $pem = "";
 	
 	public function __construct($jwt)
 	{
@@ -43,6 +43,11 @@ class OktaSimpleJWTVerifier
 	public function setIssuer($issuer)
 	{
 		$this->issuer = $issuer;
+	}
+	
+	public function setPem($pem)
+	{
+		$this->pem = $pem;
 	}
 	
 	public function verify()
@@ -111,15 +116,16 @@ class OktaSimpleJWTVerifier
 			if($key['kid'] == $head['kid'])
 			{
 				$kid_exists = 1;
-				$pem = $this->createPemFromModulusAndExponent($key['n'], $key['e']);
+				if($this->pem != "")
+					$pem = $this->pem;
+				else
+					$pem = $this->createPemFromModulusAndExponent($key['n'], $key['e']);
 				break;
 			}
 		}
 		
 		if($kid_exists == 0)
-		{
 			$this->error = "ERROR: The signing key for the token was not found under /keys endpoint.";
-		}
 		
 		if(openssl_verify($part[0] . "." . $part[1], $this->urlsafeB64Decode($part[2]), $pem, OPENSSL_ALGO_SHA256))
 		{
@@ -135,7 +141,7 @@ class OktaSimpleJWTVerifier
 		return $this->error;
 	}
 
-    private function createPemFromModulusAndExponent($n, $e)
+    public function createPemFromModulusAndExponent($n, $e)
     {
         $modulus = $this->urlsafeB64Decode($n);
         $publicExponent = $this->urlsafeB64Decode($e);
