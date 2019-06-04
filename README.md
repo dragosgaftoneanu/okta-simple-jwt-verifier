@@ -16,7 +16,7 @@ The PHP class can be initiated through `new OktaSimpleJWTVerifier($jwt)`, where 
 This method sets an audience to be checked in the JWT token.
 
 ### setClientId($clientId)
-This method sets a client ID to be checked inside "cid" claim, which is present in access tokens.
+This method sets a client ID to be checked inside `cid` claim, which is present in access tokens.
 
 ### setIssuer($issuer)
 This method sets an issuer to be checked in the JWT token.
