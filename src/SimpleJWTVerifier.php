@@ -53,112 +53,40 @@ class SimpleJWTVerifier extends Exception
 	public function verify()
 	{
 		if(!stristr($this->jwt, "."))
-		{
-			throw new \Exception(
-				json_encode(array(
-					"error" => array(
-						"errorSummary" => "The JWT provided does not contain a delimiter between header, payload and signature."
-					)
-				),JSON_UNESCAPED_SLASHES)
-			);
-		}
+			$this->error("The JWT provided does not contain a delimiter between header, payload and signature.");
 		
 		$part = explode(".",$this->jwt);
 		
 		if(count($part)!=3)
-		{
-			throw new \Exception(
-				json_encode(array(
-					"error" => array(
-						"errorSummary" => "The JWT provided does not contain the expected structure."
-					)
-				),JSON_UNESCAPED_SLASHES)
-			);
-		}
+			$this->error("The JWT provided does not contain the expected structure.");
 		
 		$head = json_decode(base64_decode($part[0]),1);
 		$body = json_decode(base64_decode($part[1]),1);
 		
 		if($head['alg'] != "RS256")
-		{
-			throw new \Exception(
-				json_encode(array(
-					"error" => array(
-						"errorSummary" => "The JWT token is generated through an unsupported algorithm."
-					)
-				),JSON_UNESCAPED_SLASHES)
-			);
-		}
+			$this->error("The JWT token is generated through an unsupported algorithm.");
 		
 		if($body['iat'] > time())
-		{
-			throw new \Exception(
-				json_encode(array(
-					"error" => array(
-						"errorSummary" => "The JWT was issued in the future."
-					)
-				),JSON_UNESCAPED_SLASHES)
-			);
-		}
+			$this->error("The JWT was issued in the future.");
 		
 		if($body['exp'] < time())
-		{
-			throw new \Exception(
-				json_encode(array(
-					"error" => array(
-						"errorSummary" => "The JWT is expired."
-					)
-				),JSON_UNESCAPED_SLASHES)
-			);
-		}
+			$this->error("The JWT is expired.");
 		
 		if($this->audience != "")
 			if($this->audience != $body['aud'])
-			{
-				throw new \Exception(
-					json_encode(array(
-						"error" => array(
-							"errorSummary" => "The JWT does not contain the expected audience."
-						)
-					),JSON_UNESCAPED_SLASHES)
-				);
-			}
+				$this->error("The JWT does not contain the expected audience.");
 
 		if($this->clientId != "")
 			if($this->clientId != $body['cid'])
-			{
-				throw new \Exception(
-					json_encode(array(
-						"error" => array(
-							"errorSummary" => "The JWT does not contain the expected client ID."
-						)
-					),JSON_UNESCAPED_SLASHES)
-				);
-			}	
+				$this->error("The JWT does not contain the expected client ID.");
 		
 		if($this->issuer != "")
 			if($this->issuer != $body['iss'])
-			{
-				throw new \Exception(
-					json_encode(array(
-						"error" => array(
-							"errorSummary" => "The JWT does not contain the expected issuer."
-						)
-					),JSON_UNESCAPED_SLASHES)
-				);
-			}	
+				$this->error("The JWT does not contain the expected issuer.");
 
 		if($this->nonce != "")
 			if($this->nonce != $body['nonce'])
-			{
-				throw new \Exception(
-					json_encode(array(
-						"error" => array(
-							"errorSummary" => "The JWT does not contain the expected nonce."
-						)
-					),JSON_UNESCAPED_SLASHES)
-				);	
-			}				
+				$this->error("The JWT does not contain the expected nonce.");			
 		
 		$keys = json_decode(file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration"),1)['jwks_uri']),1)['keys'];
 		
@@ -177,27 +105,26 @@ class SimpleJWTVerifier extends Exception
 		}
 		
 		if($kid_exists == 0)
-			throw new \Exception(
-				json_encode(array(
-					"error" => array(
-						"errorSummary" => "The signing key for the token was not found under /keys endpoint."
-					)
-				),JSON_UNESCAPED_SLASHES)
-			);			
+			$this->error("The signing key for the token was not found under /keys endpoint.");		
 			
 		
 		if(openssl_verify($part[0] . "." . $part[1], $this->urlsafeB64Decode($part[2]), $pem, OPENSSL_ALGO_SHA256))
 		{
 			return $body;
 		}else{
-			throw new \Exception(
-				json_encode(array(
-					"error" => array(
-						"errorSummary" => "The signature could not be verified."
-					)
-				),JSON_UNESCAPED_SLASHES)
-			);
+			$this->error("The signature could not be verified.");
 		}
+	}
+
+	private function error($message)
+	{
+		throw new \Exception(
+			json_encode(array(
+				"error" => array(
+					"errorSummary" => $message
+				)
+			),JSON_UNESCAPED_SLASHES)
+		);
 	}
 
     public function createPemFromModulusAndExponent($n, $e)
