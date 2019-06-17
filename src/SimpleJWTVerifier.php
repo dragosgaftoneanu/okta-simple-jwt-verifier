@@ -13,17 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+namespace Okta\SimpleJWTVerifier;
+use Exception;
 
-$jwt = new OktaSimpleJWTVerifier("eyJraWQiOiJfbTE0cC02emlzY3Vfd2RUekM4VmlKRDNBSTl1VU9qT3pDSHllMjNLcVF3IiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULlNid2ZReGNHQm5WVVFPTEN0bTg5S2RaUkJDeW9NOXBBRVZlLUwyWFpWeG8iLCJpc3MiOiJodHRwczovL2RyYWdvcy5va3RhcHJldmlldy5jb20vb2F1dGgyL2F1c2w2dG80NHkyNkp0eUdQMGg3IiwiYXVkIjoiaHR0cHM6Ly9kZXYub2t0YS5hZG1pbnBhbmVsLmJpeiIsImlhdCI6MTU1OTY1NTgzNSwiZXhwIjoxNTU5NjU5NDM1LCJjaWQiOiIwb2FsNnA4emdxT2VhTDg1QzBoNyIsInVpZCI6IjAwdWVheThqY2Q1a2tNV3MyMGg3Iiwic2NwIjpbIm9wZW5pZCIsInByb2ZpbGUiXSwic3ViIjoiZHJhZ29zLmdhZnRvbmVhbnVAZ21haWwuY29tIn0.EamQpMdyei-Zf-4NwbFHCoHfK8UncYFuvK5w-TpQIPdSVBsgxHqoQr_Ez5GqURniNKvt-XT4ZF2CAcSrW17R2Gdjyls7vXCyDWRKCV4D06a9qGXDdvxmkLJgzF5bE3d3TV3DHlqtts69IHDVugPZvYQRnSPaWG6MJFl2Sz80W38Quj0IUupz4AdSL-eUCB5gZkNbf73e0dwUO59MRGG_g_RGkZyyLROo_TwxMyXdTZiIqKeLCW-XA8KDn64DgJQydKTKRlFO4YXU1vLvK4qpCvi6JJf0zvqDKBt_KH9jBaM8qNLIOjB6ppzpCa6s7OrRSLNymhvAF_3IvTUKXOfxEg");
-
-if($jwt->verify())
-	echo "JWT has been successfully verified.";
-else
-	echo $jwt->getError();
-
-class OktaSimpleJWTVerifier
+class SimpleJWTVerifier extends Exception
 {
-	protected $jwt, $audience = "", $clientId = "", $issuer = "", $error = "", $pem = "";
+	protected $jwt, $audience = "", $clientId = "", $issuer = "", $error = "", $pem = "", $nonce = "";
 	
 	public function __construct($jwt)
 	{
@@ -50,20 +45,35 @@ class OktaSimpleJWTVerifier
 		$this->pem = $pem;
 	}
 	
+	public function setNonce($nonce)
+	{
+		$this->nonce = $nonce;
+	}
+	
 	public function verify()
 	{
 		if(!stristr($this->jwt, "."))
 		{
-			$this->error = "ERROR: The JWT provided does not contain a delimiter between header, payload and signature.";
-			return false;
+			throw new \Exception(
+				json_encode(array(
+					"error" => array(
+						"errorSummary" => "The JWT provided does not contain a delimiter between header, payload and signature."
+					)
+				),JSON_UNESCAPED_SLASHES)
+			);
 		}
 		
 		$part = explode(".",$this->jwt);
 		
 		if(count($part)!=3)
 		{
-			$this->error = "ERROR: The JWT provided does not contain the expected structure.";
-			return false;
+			throw new \Exception(
+				json_encode(array(
+					"error" => array(
+						"errorSummary" => "The JWT provided does not contain the expected structure."
+					)
+				),JSON_UNESCAPED_SLASHES)
+			);
 		}
 		
 		$head = json_decode(base64_decode($part[0]),1);
@@ -71,42 +81,84 @@ class OktaSimpleJWTVerifier
 		
 		if($head['alg'] != "RS256")
 		{
-			$this->error = "ERROR: The JWT token is generated through an unsupported algorithm.";
-			return false;
+			throw new \Exception(
+				json_encode(array(
+					"error" => array(
+						"errorSummary" => "The JWT token is generated through an unsupported algorithm."
+					)
+				),JSON_UNESCAPED_SLASHES)
+			);
 		}
 		
 		if($body['iat'] > time())
 		{
-			$this->error = "ERROR: The JWT was issued in the future.";
-			return false;
+			throw new \Exception(
+				json_encode(array(
+					"error" => array(
+						"errorSummary" => "The JWT was issued in the future."
+					)
+				),JSON_UNESCAPED_SLASHES)
+			);
 		}
 		
 		if($body['exp'] < time())
 		{
-			$this->error = "ERROR: The JWT is expired.";
-			return false;
+			throw new \Exception(
+				json_encode(array(
+					"error" => array(
+						"errorSummary" => "The JWT is expired."
+					)
+				),JSON_UNESCAPED_SLASHES)
+			);
 		}
 		
 		if($this->audience != "")
 			if($this->audience != $body['aud'])
 			{
-				$this->error = "ERROR: The JWT does not contain the expected audience.";
-				return false;
+				throw new \Exception(
+					json_encode(array(
+						"error" => array(
+							"errorSummary" => "The JWT does not contain the expected audience."
+						)
+					),JSON_UNESCAPED_SLASHES)
+				);
 			}
 
 		if($this->clientId != "")
 			if($this->clientId != $body['cid'])
 			{
-				$this->error = "ERROR: The JWT does not contain the expected client ID.";
-				return false;
+				throw new \Exception(
+					json_encode(array(
+						"error" => array(
+							"errorSummary" => "The JWT does not contain the expected client ID."
+						)
+					),JSON_UNESCAPED_SLASHES)
+				);
 			}	
 		
 		if($this->issuer != "")
 			if($this->issuer != $body['iss'])
 			{
-				$this->error = "ERROR: The JWT does not contain the expected issuer.";
-				return false;
-			}		
+				throw new \Exception(
+					json_encode(array(
+						"error" => array(
+							"errorSummary" => "The JWT does not contain the expected issuer."
+						)
+					),JSON_UNESCAPED_SLASHES)
+				);
+			}	
+
+		if($this->nonce != "")
+			if($this->nonce != $body['nonce'])
+			{
+				throw new \Exception(
+					json_encode(array(
+						"error" => array(
+							"errorSummary" => "The JWT does not contain the expected nonce."
+						)
+					),JSON_UNESCAPED_SLASHES)
+				);	
+			}				
 		
 		$keys = json_decode(file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration"),1)['jwks_uri']),1)['keys'];
 		
@@ -125,20 +177,27 @@ class OktaSimpleJWTVerifier
 		}
 		
 		if($kid_exists == 0)
-			$this->error = "ERROR: The signing key for the token was not found under /keys endpoint.";
+			throw new \Exception(
+				json_encode(array(
+					"error" => array(
+						"errorSummary" => "The signing key for the token was not found under /keys endpoint."
+					)
+				),JSON_UNESCAPED_SLASHES)
+			);			
+			
 		
 		if(openssl_verify($part[0] . "." . $part[1], $this->urlsafeB64Decode($part[2]), $pem, OPENSSL_ALGO_SHA256))
 		{
-			return true;
+			return $body;
 		}else{
-			$this->error = "ERROR: The signature could not be verified.";
-			return false;
+			throw new \Exception(
+				json_encode(array(
+					"error" => array(
+						"errorSummary" => "The signature could not be verified."
+					)
+				),JSON_UNESCAPED_SLASHES)
+			);
 		}
-	}
-	
-	public function getError()
-	{
-		return $this->error;
 	}
 
     public function createPemFromModulusAndExponent($n, $e)

@@ -1,0 +1,18 @@
+{
+    "name": "dragosgaftoneanu/okta-simple-jwt-verifier",
+    "description": "SDK used to verify JWT tokens issued by Okta orgs.",
+    "license": "Apache-2.0",
+    "authors": [{
+        "name": "Dragos Gaftoneanu",
+        "email": "dragos.gaftoneanu@okta.com"
+    }],
+    "autoload": {
+        "psr-4": {
+            "Okta\\SimpleJWTVerifier\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "minimum-stability": "stable"
+}
