@@ -25,7 +25,7 @@ This method sets a client ID to be checked inside `cid` claim, which is present 
 This method sets an issuer to be checked in the JWT token.
 
 ### setPem($pem)
-This method sets the public certificate that will be used to check the JWT token. This is useful when you want to verify against a locally saved certificate.
+This method sets the public key that will be used to check the JWT token. This is useful when you want to verify against a locally saved key.
 
 ### setNonce($nonce)
 This method sets a nonce to be checked in the JWT token.
@@ -44,7 +44,7 @@ This method verifies the following details inside a JWT token:
 The result of this method is an array containing the body of the JWT token sent for verification.
 
 ### createPemFromModulusAndExponent($n, $e)
-This method creates the public certificate from modulus and exponent present on /keys endpoint.
+This method creates the public key from modulus and exponent present on /keys endpoint.
 
 ## Example
 The following example takes a JWT token, verifies it and, based on the response, it returns a feedback.
