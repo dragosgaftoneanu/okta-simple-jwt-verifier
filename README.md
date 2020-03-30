@@ -19,7 +19,10 @@ composer require dragosgaftoneanu/okta-simple-jwt-verifier
 This method sets an audience to be checked in the JWT token.
 
 ### setClientId($clientId)
-This method sets a client ID to be checked inside `cid` claim, which is present in access tokens.
+This method sets a client ID to be checked inside `cid` claim, which is present in access tokens, or to be used in token introspection.
+
+### setClientSecret($clientSecret)
+This method sets a client secret to be used in token introspection.
 
 ### setIssuer($issuer)
 This method sets an issuer to be checked in the JWT token.
