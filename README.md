@@ -30,6 +30,9 @@ This method sets the public key that will be used to check the JWT token. This i
 ### setNonce($nonce)
 This method sets a nonce to be checked in the JWT token.
 
+### useIntrospect($status)
+This method changes the JWT verification to use /introspect endpoint instead of local verification.
+
 ### verify()
 This method verifies the following details inside a JWT token:
 * algorithm inside header to be set to RS256 (the current supported algorithm)
@@ -87,6 +90,47 @@ Array
     [org] => test
 )
 ```
+
+### Example /introspect verification
+```php
+use Okta\SimpleJWTVerifier\SimpleJWTVerifier;
+
+try{
+	$jwt = new SimpleJWTVerifier("eyJraWQiOiJKV1psRUJoZUhVQ1ZwSWJvekw1MnByUDZTRUh1YkQwU2dxNlRCNUc0MjhVIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULmhRUzN3OFlOekYxTzBhYzk4cm5hcVp4NldtZlA2Zk03WGgxNGRlU1hkQmsiLCJpc3MiOiJodHRwczovL2RyYWdvcy5va3RhLmNvbSIsImF1ZCI6Imh0dHBzOi8vZHJhZ29zLm9rdGEuY29tIiwic3ViIjoidGVzdC51c2VyQG9rdGEubG9jYWwiLCJpYXQiOjE1ODU1NTQzNTIsImV4cCI6MTU4NTU1Nzk1MiwiY2lkIjoiMG9hMmZhdHg3MEpHaVUyVEEycDciLCJ1aWQiOiIwMHVvemJnYzAzd3pxb2FYcDJwNiIsInNjcCI6WyJvcGVuaWQiXX0.okZDD1S6fhVs8_QEj_q0v73aBpZu7GLkj8ywgw6Jsl1EhQDQXqa05j5UXEn8eR2Nz3mSaY8kdAZJJfWiQKa19x5FplNy3OTq8tqdAHn24wsk5W5jwVys896dTp3UgGUXe2D7yq6pIUquuGUkJ1ymvQHTP2dy_FW3CFodvcJWhIRGm57OIA8v7DuBM1kNE-vJlsAJjjRrgCWa1IJZMstsDD1oOSNdXz7_inCg6qOaeI9QE_CmfFHAuqHAC40nN4_GaAk2IgOpU2SLq3CFaZhlypVSb1luss4NemKcjIja7-BSXgtnS5gHj1-vokXxvxnpxiGYBs7l4HgIVWc_BEsCzg");
+	$jwt->setClientId("0oa2fatx70JGiU2TA2p7");
+	$jwt->setClientSecret("jX-hj3j7GOxKqNcndtjs5se5a4yxr9jGIydtN3daK");
+	$jwt->useIntrospect(TRUE);
+	$result = $jwt->verify();
+	print_r($result);
+}catch (Exception $e){
+	echo $e->getMessage();
+}
+```
+
+The response returned, at the moment of writing the README, will be
+
+```
+
+Array
+(
+    [ver] => 1
+    [jti] => AT.hQS3w8YNzF1O0ac98rnaqZx6WmfP6fM7Xh14deSXdBk
+    [iss] => https://dragos.okta.com
+    [aud] => https://dragos.okta.com
+    [sub] => test.user@okta.local
+    [iat] => 1585554352
+    [exp] => 1585557952
+    [cid] => 0oa2fatx70JGiU2TA2p7
+    [uid] => 00uozbgc03wzqoaXp2p6
+    [scp] => Array
+        (
+            [0] => openid
+        )
+
+)
+```
+
+:warning: Token introspection requires a request to /introspect endpoint of the authorization server from where the token was issued as described [here](https://developer.okta.com/docs/reference/api/oidc/#introspect). For flexibility, the SDK **does not check the rate limits** of the Okta organization.
 
 ## Copyright
 This SDK was built based on [okta/okta-jwt-verifier-php](https://github.com/okta/okta-jwt-verifier-php) and [firebase/php-jwt](https://github.com/firebase/php-jwt).
