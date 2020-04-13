@@ -49,6 +49,8 @@ This method verifies the following details inside a JWT token:
 
 The result of this method is an array containing the body of the JWT token sent for verification.
 
+If you are using `useIntrospect()`, `verify()` will instead do a request to the /introspect endpoint of the authorization server.
+
 ### createPemFromModulusAndExponent($n, $e)
 This method creates the public key from modulus and exponent present on /keys endpoint.
 
@@ -137,6 +139,3 @@ Array
 
 ## Copyright
 This SDK was built based on [okta/okta-jwt-verifier-php](https://github.com/okta/okta-jwt-verifier-php) and [firebase/php-jwt](https://github.com/firebase/php-jwt).
-
-## Bugs?
-If you find a bug or encounter an issue when using the SDK, please open an issue on GitHub [here](https://github.com/dragosgaftoneanu/okta-simple-jwt-verifier/issues) and it will be further investigated.
