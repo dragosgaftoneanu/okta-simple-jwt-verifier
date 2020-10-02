@@ -111,9 +111,8 @@ class SimpleJWTVerifier extends Exception
 			if($this->clientId != $body['cid'])
 				$this->error("The JWT does not contain the expected client ID.");
 		
-		if($this->issuer != "")
-			if($this->issuer != $body['iss'])
-				$this->error("The JWT does not contain the expected issuer.");
+		if($this->issuer != $body['iss'])
+			$this->error("The JWT does not contain the expected issuer.");
 
 		if($this->nonce != "")
 			if($this->nonce != $body['nonce'])
@@ -129,7 +128,7 @@ class SimpleJWTVerifier extends Exception
 				if($this->clientSecret != "")
 					$con .= "&client_secret=" . $this->clientSecret;
 				
-				$introspect = @file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration", false, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.1")))),1)['introspection_endpoint'], FALSE, stream_context_create(array('http'=>array('method'=>"POST",'header'=>"Accept: application/json\r\nContent-Type: application/x-www-form-urlencoded\r\nUser-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.1\r\n",'content'=>$con))));
+				$introspect = @file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration", false, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.2")))),1)['introspection_endpoint'], FALSE, stream_context_create(array('http'=>array('method'=>"POST",'header'=>"Accept: application/json\r\nContent-Type: application/x-www-form-urlencoded\r\nUser-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.2\r\n",'content'=>$con))));
 				
 				if(!$introspect)
 				{
@@ -142,7 +141,7 @@ class SimpleJWTVerifier extends Exception
 				}
 			}
 		}else{
-			$keys = json_decode(file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration", false, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.1")))),1)['jwks_uri'], FALSE, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.1")))),1)['keys'];
+			$keys = json_decode(file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration", false, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.2")))),1)['jwks_uri'], FALSE, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.2")))),1)['keys'];
 			
 			foreach($keys as $key)
 			{
