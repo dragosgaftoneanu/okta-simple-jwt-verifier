@@ -4,7 +4,7 @@
     "license": "BSD-3-Clause",
     "authors": [{
         "name": "Dragos Gaftoneanu",
-        "email": "dragos.gaftoneanu@okta.com"
+        "email": "dragos.gaftoneanu@gmail.com"
     }],
     "autoload": {
         "psr-4": {
