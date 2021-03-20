@@ -1,10 +1,10 @@
 # Okta Simple JWT Verifier
-Okta Simple JWT Verifier is a simple stand-alone SDK that can be used to verify JWT tokens issued by Okta orgs.
+Okta Simple JWT Verifier is a simple stand-alone library that can be used to verify JWT tokens issued by Okta orgs.
 
 :warning: **Disclaimer:** This is not an official product and does not qualify for Okta Support.
 
 ## Installation
-You can install this SDK by running the following command through Composer
+You can install this library by running the following command through Composer
 
 ```
 composer require dragosgaftoneanu/okta-simple-jwt-verifier
@@ -136,7 +136,7 @@ Array
 )
 ```
 
-:warning: Token introspection requires a request to /introspect endpoint of the authorization server from where the token was issued as described [here](https://developer.okta.com/docs/reference/api/oidc/#introspect). For flexibility, the SDK **does not check the rate limits** of the Okta organization.
+:warning: Token introspection requires a request to /introspect endpoint of the authorization server from where the token was issued as described [here](https://developer.okta.com/docs/reference/api/oidc/#introspect). For flexibility, the library **does not check the rate limits** of the Okta organization.
 
 ## Copyright
-This SDK was built based on [okta/okta-jwt-verifier-php](https://github.com/okta/okta-jwt-verifier-php) and [firebase/php-jwt](https://github.com/firebase/php-jwt).
+This library was built based on [okta/okta-jwt-verifier-php](https://github.com/okta/okta-jwt-verifier-php) and [firebase/php-jwt](https://github.com/firebase/php-jwt).
