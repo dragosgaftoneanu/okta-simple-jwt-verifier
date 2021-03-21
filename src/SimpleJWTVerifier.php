@@ -128,7 +128,7 @@ class SimpleJWTVerifier extends Exception
 				if($this->clientSecret != "")
 					$con .= "&client_secret=" . $this->clientSecret;
 				
-				$introspect = @file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration", false, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.2")))),1)['introspection_endpoint'], FALSE, stream_context_create(array('http'=>array('method'=>"POST",'header'=>"Accept: application/json\r\nContent-Type: application/x-www-form-urlencoded\r\nUser-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.2\r\n",'content'=>$con))));
+				$introspect = @file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration", false, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier")))),1)['introspection_endpoint'], FALSE, stream_context_create(array('http'=>array('method'=>"POST",'header'=>"Accept: application/json\r\nContent-Type: application/x-www-form-urlencoded\r\nUser-agent: dragosgaftoneanu/okta-simple-jwt-verifier\r\n",'content'=>$con))));
 				
 				if(!$introspect)
 				{
@@ -141,7 +141,7 @@ class SimpleJWTVerifier extends Exception
 				}
 			}
 		}else{
-			$keys = json_decode(file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration", false, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.2")))),1)['jwks_uri'], FALSE, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier/1.2")))),1)['keys'];
+			$keys = json_decode(file_get_contents(json_decode(file_get_contents($body['iss'] . "/.well-known/openid-configuration", false, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier")))),1)['jwks_uri'], FALSE, stream_context_create(array('http'=>array('method'=>"GET",'header'=>"User-agent: dragosgaftoneanu/okta-simple-jwt-verifier")))),1)['keys'];
 			
 			foreach($keys as $key)
 			{
